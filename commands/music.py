@@ -1,19 +1,14 @@
 import random
 import discord
 
-def setup_music(
-    bot,
-    scheduler,
-    GENERAL_CHANNEL_ID
-):
+last_poll_message_id = None
+
+def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
     async def send_daily_mood_poll():
         global last_poll_message_id
 
-        channel = bot.get_channel(
-            GENERAL_CHANNEL_ID
-        )
-
+        channel = bot.get_channel(GENERAL_CHANNEL_ID)
         if channel is None:
             return
 
@@ -28,7 +23,7 @@ def setup_music(
             "😔 = Sedih\n"
             "😐 = Biasa Saja\n\n"
             "Pilih salah satu yaa~\n"
-            "Jam 19:00 aku akan mengumumkan hasilnya 💙"
+            "Jam 19:30 aku akan mengumumkan hasilnya 💙"
         )
 
         await poll.add_reaction("😊")
@@ -37,39 +32,18 @@ def setup_music(
 
         last_poll_message_id = poll.id
 
-        scheduler.add_job(
-        send_daily_mood_poll,
-        "cron",
-        hour=18,
-        minute=10
-        )
-
-        scheduler.add_job(
-        send_song_of_the_day,
-        "cron",
-        hour=19,
-        minute=00
-        )
-
     async def send_song_of_the_day():
         global last_poll_message_id
 
         if last_poll_message_id is None:
             return
 
-        channel = bot.get_channel(
-            GENERAL_CHANNEL_ID
-        )
-
+        channel = bot.get_channel(GENERAL_CHANNEL_ID)
         if channel is None:
             return
 
         try:
-
-            poll_msg = await channel.fetch_message(
-                last_poll_message_id
-            )
-
+            poll_msg = await channel.fetch_message(last_poll_message_id)
         except:
             return
 
@@ -78,85 +52,47 @@ def setup_music(
         normal = 0
 
         for reaction in poll_msg.reactions:
-
             if str(reaction.emoji) == "😊":
                 happy = reaction.count - 1
-
             elif str(reaction.emoji) == "😔":
                 sad = reaction.count - 1
-
             elif str(reaction.emoji) == "😐":
                 normal = reaction.count - 1
 
-        result = {
-            "senang": happy,
-            "sedih": sad,
-            "biasa": normal
-        }
+        result = {"senang": happy, "sedih": sad, "biasa": normal}
 
-        mood = max(
-            result,
-            key=result.get
-        )
+        mood = max(result, key=result.get)
 
-        song = random.choice(
-            SONG_DATABASE[mood]
-        )
+        song = random.choice(SONG_DATABASE[mood])
 
-        mood_icon = {
-            "senang": "😊",
-            "sedih": "😔",
-            "biasa": "😐"
-        }
+        mood_icon = {"senang": "😊", "sedih": "😔", "biasa": "😐"}
 
         embed = discord.Embed(
-            title="🎵 Song of the Day",
-            color=discord.Color.blue()
+            title="🎵 Song of the Day", color=discord.Color.blue()
         )
 
         embed.add_field(
             name="Mood Hari Ini",
             value=f"{mood_icon[mood]} {mood.title()}",
-            inline=False
+            inline=False,
         )
+        embed.add_field(name="Lagu", value=song["title"], inline=False)
+        embed.add_field(name="Album", value=song["album"], inline=False)
 
-        embed.add_field(
-            name="Lagu",
-            value=song["title"],
-            inline=False
-        )
+        embed.set_footer(text="Semoga lagu ini menemani malam kalian 💙")
 
-        embed.add_field(
-            name="Album",
-            value=song["album"],
-            inline=False
-        )
+        file = discord.File(song["banner"], filename="album.jpg")
+        embed.set_image(url="attachment://album.jpg")
 
-        embed.set_footer(
-            text="Semoga lagu ini menemani malam kalian💙"
-        )
-
-        file = discord.File(
-            song["banner"],
-            filename="album.jpg"
-        )
-        
-        embed.set_image(
-            url="attachment://album.jpg"
-        )
-
-        await channel.send(
-            "@everyone",
-            embed=embed,
-            file=file
-        )
+        await channel.send("@everyone", embed=embed, file=file)
 
     scheduler.add_job(
         send_daily_mood_poll,
         "cron",
         hour=18,
-        minute=10,
-        id="daily_poll"
+        minute=30,
+        id="daily_poll",
+        replace_existing=True,  
     )
 
     scheduler.add_job(
@@ -164,7 +100,8 @@ def setup_music(
         "cron",
         hour=19,
         minute=0,
-        id="daily_song"
+        id="daily_song",
+        replace_existing=True,
     )
 
     print("Music scheduler loaded")

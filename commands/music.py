@@ -89,8 +89,8 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     scheduler.add_job(
         send_daily_mood_poll,
         "cron",
-        hour=18,
-        minute=30,
+        hour=12,
+        minute=0,
         id="daily_poll",
         replace_existing=True,  
     )
@@ -98,7 +98,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     scheduler.add_job(
         send_song_of_the_day,
         "cron",
-        hour=19,
+        hour=13,
         minute=0,
         id="daily_song",
         replace_existing=True,

@@ -14,7 +14,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
         poll = await channel.send(
             "@everyone\n\n"
-            "💙 Haii LANY Fam!\n\n"
+            "💙 Haiii guyys!\n\n"
             "Bagaimana kabar kalian hari ini?\n\n"
             "Semoga harimu menyenangkan ya ✨\n\n"
             "Aku ingin menyiapkan Song of the Day "
@@ -23,7 +23,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
             "😔 = Sedih\n"
             "😐 = Biasa Saja\n\n"
             "Pilih salah satu yaa~\n"
-            "Jam 19:30 aku akan mengumumkan hasilnya 💙"
+            "Jam 19:00 aku akan mengumumkan hasilnya 💙"
         )
 
         await poll.add_reaction("😊")
@@ -89,7 +89,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     scheduler.add_job(
         send_daily_mood_poll,
         "cron",
-        hour=12,
+        hour=10,
         minute=0,
         id="daily_poll",
         replace_existing=True,  
@@ -98,7 +98,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     scheduler.add_job(
         send_song_of_the_day,
         "cron",
-        hour=13,
+        hour=12,
         minute=0,
         id="daily_song",
         replace_existing=True,

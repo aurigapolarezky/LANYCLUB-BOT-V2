@@ -1,56 +1,57 @@
+import random
+import discord
+
 def setup_music(
     bot,
     scheduler,
     GENERAL_CHANNEL_ID
 ):
-    
- async def send_daily_mood_poll():
 
-    global last_poll_message_id
+    async def send_daily_mood_poll():
+        global last_poll_message_id
 
-    channel = bot.get_channel(
-        GENERAL_CHANNEL_ID
-    )
+        channel = bot.get_channel(
+            GENERAL_CHANNEL_ID
+        )
 
-    if channel is None:
-        return
+        if channel is None:
+            return
 
-    poll = await channel.send(
-        "@everyone\n\n"
-        "💙 Haii LANY Fam!\n\n"
-        "Bagaimana kabar kalian hari ini?\n\n"
-        "Semoga harimu menyenangkan ya ✨\n\n"
-        "Aku ingin menyiapkan Song of the Day "
-        "berdasarkan mood kalian hari ini 🎵\n\n"
-        "😊 = Senang\n"
-        "😔 = Sedih\n"
-        "😐 = Biasa Saja\n\n"
-        "Pilih salah satu yaa~\n"
-        "Jam 19:00 aku akan mengumumkan hasilnya 💙"
-    )
+        poll = await channel.send(
+            "@everyone\n\n"
+            "💙 Haii LANY Fam!\n\n"
+            "Bagaimana kabar kalian hari ini?\n\n"
+            "Semoga harimu menyenangkan ya ✨\n\n"
+            "Aku ingin menyiapkan Song of the Day "
+            "berdasarkan mood kalian hari ini 🎵\n\n"
+            "😊 = Senang\n"
+            "😔 = Sedih\n"
+            "😐 = Biasa Saja\n\n"
+            "Pilih salah satu yaa~\n"
+            "Jam 19:00 aku akan mengumumkan hasilnya 💙"
+        )
 
-    await poll.add_reaction("😊")
-    await poll.add_reaction("😔")
-    await poll.add_reaction("😐")
+        await poll.add_reaction("😊")
+        await poll.add_reaction("😔")
+        await poll.add_reaction("😐")
 
-    last_poll_message_id = poll.id
+        last_poll_message_id = poll.id
 
-    scheduler.add_job(
-    send_daily_mood_poll,
-    "cron",
-    hour=17,
-    minute=00
-    )
+        scheduler.add_job(
+        send_daily_mood_poll,
+        "cron",
+        hour=17,
+        minute=00
+        )
 
-    scheduler.add_job(
-    send_song_of_the_day,
-    "cron",
-    hour=19,
-    minute=00
-    )
+        scheduler.add_job(
+        send_song_of_the_day,
+        "cron",
+        hour=19,
+        minute=00
+        )
 
     async def send_song_of_the_day():
-
         global last_poll_message_id
 
         if last_poll_message_id is None:
@@ -132,7 +133,7 @@ def setup_music(
         )
 
         embed.set_footer(
-            text="Semoga lagu ini menemani malam kalian @everyone\n\n💙"
+            text="Semoga lagu ini menemani malam kalian💙"
         )
 
         file = discord.File(
@@ -149,3 +150,22 @@ def setup_music(
             embed=embed,
             file=file
         )
+
+    scheduler.add_job(
+        send_daily_mood_poll,
+        "cron",
+        hour=18,
+        minute=0,
+        id="daily_poll"
+    )
+
+    scheduler.add_job(
+        send_song_of_the_day,
+        "cron",
+        hour=19,
+        minute=0,
+        id="daily_song"
+    )
+
+    print("Music scheduler loaded")
+    print(scheduler.get_jobs())

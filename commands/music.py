@@ -40,8 +40,8 @@ def setup_music(
         scheduler.add_job(
         send_daily_mood_poll,
         "cron",
-        hour=17,
-        minute=00
+        hour=18,
+        minute=5
         )
 
         scheduler.add_job(
@@ -155,7 +155,7 @@ def setup_music(
         send_daily_mood_poll,
         "cron",
         hour=18,
-        minute=0,
+        minute=5,
         id="daily_poll"
     )
 

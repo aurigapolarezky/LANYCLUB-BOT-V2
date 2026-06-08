@@ -299,7 +299,7 @@ def setup_announcement(
     @app_commands.checks.has_permissions(
     administrator=True
     )
-    
+
     async def slash_announce(
     interaction: discord.Interaction
     ):
@@ -307,3 +307,19 @@ def setup_announcement(
         await interaction.response.send_modal(
         AnnouncementModal()
         )
+
+    @slash_announce.error
+    async def announce_error(
+    interaction: discord.Interaction,
+    error
+    ):
+
+        if isinstance(
+        error,
+        app_commands.MissingPermissions
+        ):
+
+            await interaction.response.send_message(
+            "❌ Hanya administrator yang dapat menggunakan command ini.",
+            ephemeral=True
+            )

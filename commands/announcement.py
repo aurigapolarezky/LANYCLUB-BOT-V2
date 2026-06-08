@@ -119,6 +119,8 @@ def setup_announcement(
     ANNOUNCE_CHANNEL_ID
 ):
 
+    print("Registering announce slash command")
+
     @bot.tree.command(
     name="announce",
     description="Membuat announcement"

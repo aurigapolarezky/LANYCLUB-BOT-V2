@@ -124,6 +124,21 @@ def setup_faq(bot):
     name="faq",
     description="Buka LANY FAQ Center"
     )
+    
+    async def slash_faq(
+    interaction: discord.Interaction
+    ):
+
+        embed = discord.Embed(
+        title="📚 LANY FAQ CENTER",
+        description="Pilih kategori FAQ",
+        color=discord.Color.blue()
+        )
+
+        await interaction.response.send_message(
+        embed=embed,
+        view=FAQCategoryView()
+        )
 
     @bot.tree.command(
     name="start",

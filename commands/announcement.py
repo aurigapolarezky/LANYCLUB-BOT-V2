@@ -131,12 +131,12 @@ def setup_announcement(
     )
 
     async def slash_announce(
-    interaction: discord.Interaction
+        interaction: discord.Interaction
     ):
 
         await interaction.response.send_modal(
-        AnnouncementModal(
-            ANNOUNCE_CHANNEL_ID
+            AnnouncementModal(
+                ANNOUNCE_CHANNEL_ID
         )
     )
 

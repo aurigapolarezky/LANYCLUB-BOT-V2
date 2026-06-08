@@ -58,8 +58,9 @@ async def on_ready():
     if not scheduler.running:
         scheduler.start()
 
-    await bot.tree.sync()
+    synced = await bot.tree.sync()
 
+    print(f"Synced {len(synced)} commands")
     print(f"{bot.user} online!")
 
 bot.run(TOKEN)

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 import asyncio
 
 def setup_announcement(
@@ -183,4 +184,20 @@ def setup_announcement(
 
     await ctx.send(
         "✅ Announcement berhasil dikirim."
+    )
+
+    @bot.tree.command(
+    name="announce",
+    description="Kirim announcement ke channel announcement"
+    )
+    
+    @app_commands.checks.has_permissions(administrator=True)
+    async def slash_announce(
+    interaction: discord.Interaction
+    ):
+
+        await interaction.response.send_message(
+        "Gunakan command &announce untuk sementara.\n"
+        "Versi slash command sedang dalam pengembangan.",
+        ephemeral=True
     )

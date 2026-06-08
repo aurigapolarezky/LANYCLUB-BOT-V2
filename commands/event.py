@@ -3,6 +3,7 @@ from discord.ext import commands
 from datetime import datetime
 import asyncio
 import sqlite3
+from discord import app_commands
 
 conn = sqlite3.connect("events.db")
 cursor = conn.cursor()
@@ -49,6 +50,21 @@ def setup_event(
         await ctx.send(
             f"🗑️ Event {event_id} dihapus."
         )
+
+    @bot.tree.command(
+    name="event",
+    description="Membuat event baru"
+    )
+
+    @bot.tree.command(
+    name="deleteevent",
+    description="Menghapus event"
+    )
+
+    @bot.tree.command(
+    name="listevent",
+    description="Menampilkan event aktif"
+    )
 
     @bot.command()
     @commands.has_permissions(administrator=True)
@@ -140,3 +156,4 @@ def setup_event(
         )
 
         await ctx.send(f"✅ Event '{judul}' berhasil dibuat. ID: {event_id}")
+

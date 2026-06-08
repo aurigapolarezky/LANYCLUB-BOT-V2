@@ -15,6 +15,7 @@ from commands.music import setup_music
 from commands.event import setup_event
 from commands.announcement import setup_announcement
 from dotenv import load_dotenv
+from discord import app_commands
 
 load_dotenv()
 
@@ -56,6 +57,8 @@ async def on_ready():
     
     if not scheduler.running:
         scheduler.start()
+
+    await bot.tree.sync()
 
     print(f"{bot.user} online!")
 

@@ -3,6 +3,7 @@ from discord.ui import View, Button
 from discord.ext import commands
 from data.faq_data import FAQ_DATA
 from data.song_database import SONG_DATABASE
+from discord import app_commands
 
 def create_faq_embed(category):
 
@@ -118,3 +119,21 @@ def setup_faq(bot):
         )
 
         await ctx.send(embed=embed)
+
+    @bot.tree.command(
+    name="faq",
+    description="Buka LANY FAQ Center"
+    )
+
+    @bot.tree.command(
+    name="start",
+    description="Memulai penggunaan bot"
+    )
+
+    async def slash_faq(interaction: discord.Interaction
+    ):
+         await interaction.response.send_message(
+        "Gunakan command &announce untuk sementara.\n"
+        "Versi slash command sedang dalam pengembangan.",
+        ephemeral=True
+    )

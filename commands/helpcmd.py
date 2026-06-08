@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 
 def setup_help(bot):
 
@@ -31,3 +32,16 @@ def setup_help(bot):
         )
 
         await ctx.send(embed=embed)
+
+    @bot.tree.command(
+    name="help",
+    description="Lihat daftar command"
+    )
+
+    async def slash_help(interaction: discord.Interaction
+    ):
+         await interaction.response.send_message(
+        "Gunakan command &announce untuk sementara.\n"
+        "Versi slash command sedang dalam pengembangan.",
+        ephemeral=True
+    )

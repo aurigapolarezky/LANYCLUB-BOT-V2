@@ -56,15 +56,64 @@ def setup_event(
     description="Membuat event baru"
     )
 
+    @discord.app_commands.checks.has_permissions(
+    administrator=True
+    )
+
+    async def slash_event(
+    interaction: discord.Interaction
+    ):
+
+        await interaction.response.send_message(
+        "Gunakan command &event untuk membuat event.",
+        ephemeral=True
+        )
+
     @bot.tree.command(
     name="deleteevent",
     description="Menghapus event"
     )
 
+    @discord.app_commands.checks.has_permissions(
+    administrator=True
+    )
+
+    async def slash_deleteevent(
+    interaction: discord.Interaction,
+    event_id: int
+    ):
+
+        cursor.execute(
+        "DELETE FROM events WHERE id=?",
+        (event_id,)
+        )
+
+        conn.commit()
+
+        await interaction.response.send_message(
+        f"🗑️ Event {event_id} berhasil dihapus."
+        )
+
     @bot.tree.command(
     name="listevent",
     description="Menampilkan event aktif"
     )
+
+    async def slash_listevent(
+    interaction: discord.Interaction
+    ):
+
+        rows = cursor.execute(
+        "SELECT * FROM events"
+    ).fetchall()
+
+        if not rows:
+            await interaction.response.send_message(
+            "Tidak ada event aktif."
+            )
+            return
+
+    text = "**Event Aktif**\n\n"
 
     @bot.command()
     @commands.has_permissions(administrator=True)

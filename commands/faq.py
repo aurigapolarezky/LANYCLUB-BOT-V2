@@ -124,7 +124,7 @@ def setup_faq(bot):
     name="faq",
     description="Buka LANY FAQ Center"
     )
-    
+
     async def slash_faq(
     interaction: discord.Interaction
     ):
@@ -148,7 +148,7 @@ def setup_faq(bot):
     async def slash_faq(interaction: discord.Interaction
     ):
          await interaction.response.send_message(
-        "Gunakan command &announce untuk sementara.\n"
+        "Gunakan command &start untuk sementara.\n"
         "Versi slash command sedang dalam pengembangan.",
         ephemeral=True
     )

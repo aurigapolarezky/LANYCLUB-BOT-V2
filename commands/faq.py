@@ -142,13 +142,21 @@ def setup_faq(bot):
 
     @bot.tree.command(
     name="start",
-    description="Memulai penggunaan bot"
+    description="Memulai interaksi dengan LANYCLUB BOT"
     )
+    async def slash_start(interaction: discord.Interaction):
 
-    async def slash_faq(interaction: discord.Interaction
-    ):
-         await interaction.response.send_message(
-        "Gunakan command &start untuk sementara.\n"
-        "Versi slash command sedang dalam pengembangan.",
-        ephemeral=True
-    )
+        embed = discord.Embed(
+        title="🎸 Halo!",
+        description=
+        f"Haiii {interaction.user.mention}! 👋\n\n"
+        "Aku **LANYCLUB BOT** 🤖✨\n\n"
+        "Aku siap membantu menjawab pertanyaan "
+        "tentang LANY, album, lagu, "
+        "dan berbagai hal lainnya.",
+        color=discord.Color.purple()
+        )
+
+        await interaction.response.send_message(
+        embed=embed
+        )

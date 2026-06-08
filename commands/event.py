@@ -22,6 +22,78 @@ CREATE TABLE IF NOT EXISTS events(
 conn.commit()
 print("Event database loaded")
 
+class EventModal(discord.ui.Modal, title="Buat Event"):
+
+    judul = discord.ui.TextInput(
+        label="Judul Event",
+        placeholder="Contoh: Nonton Bareng"
+    )
+
+    tanggal = discord.ui.TextInput(
+        label="Tanggal",
+        placeholder="2026-06-10"
+    )
+
+    jam = discord.ui.TextInput(
+        label="Jam",
+        placeholder="19:00"
+    )
+
+    tempat = discord.ui.TextInput(
+        label="Tempat",
+        placeholder="Discord Voice Channel"
+    )
+
+    deskripsi = discord.ui.TextInput(
+        label="Deskripsi",
+        style=discord.TextStyle.paragraph
+    )
+
+    async def on_submit(
+        self,
+        interaction: discord.Interaction
+    ):
+
+        try:
+            datetime.strptime(
+                f"{self.tanggal} {self.jam}",
+                "%Y-%m-%d %H:%M"
+            )
+
+        except ValueError:
+
+            await interaction.response.send_message(
+                "❌ Format tanggal atau jam salah.",
+                ephemeral=True
+            )
+
+            return
+
+        cursor.execute(
+            """
+            INSERT INTO events
+            (judul,tanggal,jam,tempat,deskripsi,mention)
+            VALUES(?,?,?,?,?,?)
+            """,
+            (
+                str(self.judul),
+                str(self.tanggal),
+                str(self.jam),
+                str(self.tempat),
+                str(self.deskripsi),
+                "@everyone"
+            )
+        )
+
+        conn.commit()
+
+        event_id = cursor.lastrowid
+
+        await interaction.response.send_message(
+            f"✅ Event berhasil dibuat.\nID: {event_id}",
+            ephemeral=True
+        )
+
 def setup_event(
     bot,
     scheduler,
@@ -69,18 +141,15 @@ def setup_event(
     name="event",
     description="Membuat event baru"
     )
-
-    @discord.app_commands.checks.has_permissions(
+    @app_commands.checks.has_permissions(
     administrator=True
     )
-
     async def slash_event(
     interaction: discord.Interaction
     ):
 
-        await interaction.response.send_message(
-        "Gunakan command &event untuk membuat event.",
-        ephemeral=True
+        await interaction.response.send_modal(
+        EventModal()
         )
 
     @bot.tree.command(
@@ -128,6 +197,22 @@ def setup_event(
             return
 
     text = "**Event Aktif**\n\n"
+
+    @slash_event.error
+    async def slash_event_error(
+    interaction: discord.Interaction,
+    error
+    ):
+
+        if isinstance(
+        error,
+        app_commands.MissingPermissions
+        ):
+
+            await interaction.response.send_message(
+            "❌ Hanya administrator yang dapat menggunakan command ini.",
+            ephemeral=True
+            )
 
     @bot.command()
     @commands.has_permissions(administrator=True)

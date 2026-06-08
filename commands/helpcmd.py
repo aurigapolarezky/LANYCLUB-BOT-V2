@@ -35,13 +35,40 @@ def setup_help(bot):
 
     @bot.tree.command(
     name="help",
-    description="Lihat daftar command"
+    description="Menampilkan daftar command"
     )
+    async def slash_help(interaction: discord.Interaction):
 
-    async def slash_help(interaction: discord.Interaction
-    ):
-         await interaction.response.send_message(
-        "Gunakan command &announce untuk sementara.\n"
-        "Versi slash command sedang dalam pengembangan.",
-        ephemeral=True
-    )
+        embed = discord.Embed(
+        title="📖 LANYCLUB BOT COMMANDS",
+        color=discord.Color.blue()
+        )
+
+        embed.add_field(
+        name="🎸 Umum",
+        value=
+        "/start\n"
+        "/help\n"
+        "/faq",
+        inline=False
+        )
+
+        embed.add_field(
+        name="📅 Event",
+        value=
+        "/event\n"
+        "/listevent\n"
+        "/deleteevent",
+        inline=False
+        )
+
+        embed.add_field(
+        name="📢 Announcement",
+        value=
+        "/announce",
+        inline=False
+        )
+
+        await interaction.response.send_message(
+        embed=embed
+        )

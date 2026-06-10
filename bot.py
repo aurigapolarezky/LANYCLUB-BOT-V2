@@ -16,6 +16,7 @@ from commands.event import setup_event
 from commands.announcement import setup_announcement
 from dotenv import load_dotenv
 from discord import app_commands
+from music.lavalink import connect_lavalink
 
 load_dotenv()
 
@@ -55,12 +56,13 @@ setup_announcement(
 @bot.event
 async def on_ready():
 
-    if not scheduler.running:
-        scheduler.start()
+    await bot.tree.sync()
 
-    synced = await bot.tree.sync()
+    try:
+        await connect_lavalink(bot)
+    except Exception as e:
+        print(f"❌ Lavalink Error: {e}")
 
-    print(f"Synced {len(synced)} commands")
     print(f"{bot.user} online!")
 
 bot.run(TOKEN)

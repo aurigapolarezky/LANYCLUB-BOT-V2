@@ -235,8 +235,6 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     @bot.event
     async def on_wavelink_track_end(payload):
 
-        await interaction.followup.send
-        
         player: wavelink.Player = payload.player
 
         if player.queue.is_empty:

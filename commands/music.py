@@ -4,11 +4,10 @@ from data.song_database import SONG_DATABASE
 from music.state import get_player
 from music.ytdl import ytdl, FFMPEG_OPTIONS
 from discord import app_commands
-import yt_dlp
-from music.ytdl import (
-    get_song_info,
-    FFMPEG_OPTIONS
-)
+import wavelink
+
+# Menyimpan queue tiap guild
+music_queue = {}
 from music.state import get_player
 from music.player import play_next
 
@@ -117,28 +116,28 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
     @bot.tree.command(
     name="join",
-    description="Bot bergabung ke voice channel"
+    description="Bot masuk ke voice channel"
     )
-    async def slash_join(
-        interaction: discord.Interaction
-    ):
+    async def slash_join(interaction: discord.Interaction):
 
-        if interaction.user.voice is None:
+        if not interaction.user.voice:
             await interaction.response.send_message(
-            "❌ Kamu harus berada di voice channel.",
-            ephemeral=True
+                "❌ Kamu harus berada di voice channel!",
+                ephemeral=True
             )
             return
 
         channel = interaction.user.voice.channel
 
-        if interaction.guild.voice_client is None:
-            await channel.connect()
+        player = interaction.guild.voice_client
+
+        if player is None:
+            player = await channel.connect(cls=wavelink.Player)
         else:
-            await interaction.guild.voice_client.move_to(channel)
+            await player.move_to(channel)
 
         await interaction.response.send_message(
-            f"🎵 Berhasil bergabung ke **{channel.name}**."
+            f"🎵 Bergabung ke **{channel.name}**!"
         )
 
     @bot.tree.command(
@@ -170,49 +169,60 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
     @bot.tree.command(
     name="play",
-    description="Memutar lagu dari YouTube"
+    description="Putar lagu LANY"
     )
+    @app_commands.describe(query="Judul lagu atau link YouTube")
     async def slash_play(
         interaction: discord.Interaction,
-        lagu: str
+        query: str
     ):
 
-        if interaction.user.voice is None:
+        if not interaction.user.voice:
             await interaction.response.send_message(
-                "❌ Kamu harus berada di voice channel.",
+                "❌ Kamu harus masuk voice channel dulu.",
                 ephemeral=True
             )
             return
 
-        await interaction.response.defer()
+        player: wavelink.Player = interaction.guild.voice_client
 
-        voice = interaction.guild.voice_client
-
-        if voice is None:
-            channel = interaction.user.voice.channel
-            voice = await channel.connect()
-
-        player = get_player(
-            interaction.guild.id
-        )
-
-        song = await get_song_info(lagu)
-
-        player["queue"].append(song)
-
-        await interaction.followup.send(
-            f"🎵 **{song['title']}** ditambahkan ke queue!"
-        )
-
-# Jika belum ada lagu yang sedang diputar
-        if (
-            voice.is_playing() is False and
-            player["current"] is None
-        ):
-            await play_next(
-                bot,
-                interaction.guild
+        if player is None:
+            player = await interaction.user.voice.channel.connect(
+                cls=wavelink.Player
             )
+
+        tracks = await wavelink.Playable.search(query)
+
+        if not tracks:
+            await interaction.response.send_message(
+                "❌ Lagu tidak ditemukan."
+            )
+            return
+
+        track = tracks[0]
+
+        if player.playing:
+            await player.queue.put_wait(track)
+            await interaction.response.send_message(
+                f"➕ Ditambahkan ke queue:\n**{track.title}**"
+            )
+        else:
+            await player.play(track)
+            await interaction.response.send_message(
+                f"▶️ Sekarang memutar:\n**{track.title}**"
+            )
+    
+    @bot.event
+    async def on_wavelink_track_end(payload):
+
+        player: wavelink.Player = payload.player
+
+        if player.queue.is_empty:
+            return
+
+        next_track = await player.queue.get_wait()
+
+        await player.play(next_track)
 
     print("Music scheduler loaded")
     print(scheduler.get_jobs())

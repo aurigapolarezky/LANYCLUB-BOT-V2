@@ -1,1 +1,1 @@
-discord.pyapschedulerpython-dotenv
+discord.pyapschedulerpython-dotenvPyNaCl==1.5.0yt-dlpffmpeg-python

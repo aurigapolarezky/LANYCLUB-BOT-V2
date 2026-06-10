@@ -54,17 +54,13 @@ setup_announcement(
 
 @bot.event
 async def on_ready():
-    
+
     if not scheduler.running:
         scheduler.start()
 
     synced = await bot.tree.sync()
 
-    print("===== COMMANDS =====")
-
-    for cmd in synced:
-        print(cmd.name)
-
-    print("====================")
+    print(f"Synced {len(synced)} commands")
+    print(f"{bot.user} online!")
 
 bot.run(TOKEN)

@@ -1,6 +1,10 @@
 import random
 import discord
 from data.song_database import SONG_DATABASE
+from music.state import get_player
+from music.ytdl import ytdl, FFMPEG_OPTIONS
+from discord import app_commands
+import yt_dlp
 
 last_poll_message_id = None
 
@@ -104,6 +108,59 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
         id="daily_song",
         replace_existing=True,
     )
+
+    @bot.tree.command(
+    name="join",
+    description="Bot bergabung ke voice channel"
+    )
+    async def slash_join(
+        interaction: discord.Interaction
+    ):
+
+        if interaction.user.voice is None:
+            await interaction.response.send_message(
+            "❌ Kamu harus berada di voice channel.",
+            ephemeral=True
+            )
+            return
+
+        channel = interaction.user.voice.channel
+
+        if interaction.guild.voice_client is None:
+            await channel.connect()
+        else:
+            await interaction.guild.voice_client.move_to(channel)
+
+        await interaction.response.send_message(
+            f"🎵 Berhasil bergabung ke **{channel.name}**."
+        )
+
+    @bot.tree.command(
+    name="stop",
+    description="Menghentikan musik dan keluar dari voice channel"
+    )
+    async def slash_stop(
+        interaction: discord.Interaction
+    ):
+
+        voice = interaction.guild.voice_client
+
+        if voice is None:
+            await interaction.response.send_message(
+                "❌ Bot sedang tidak berada di voice channel.",
+                ephemeral=True
+            )
+            return
+
+        player = get_player(interaction.guild.id)
+        player["queue"].clear()
+        player["current"] = None
+
+        await voice.disconnect()
+
+        await interaction.response.send_message(
+            "⏹️ Music player dihentikan dan bot keluar dari voice channel."
+        )
 
     print("Music scheduler loaded")
     print(scheduler.get_jobs())

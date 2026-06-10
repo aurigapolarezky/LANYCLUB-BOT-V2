@@ -5,6 +5,11 @@ from music.state import get_player
 from music.ytdl import ytdl, FFMPEG_OPTIONS
 from discord import app_commands
 import yt_dlp
+from music.ytdl import (
+    get_song_info,
+    FFMPEG_OPTIONS
+)
+from music.state import get_player
 
 last_poll_message_id = None
 
@@ -160,6 +165,42 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
         await interaction.response.send_message(
             "⏹️ Music player dihentikan dan bot keluar dari voice channel."
+        )
+
+    @bot.tree.command(
+    name="play",
+    description="Memutar lagu dari YouTube"
+    )
+    async def slash_play(
+        interaction: discord.Interaction,
+        lagu: str
+    ):
+
+        if interaction.user.voice is None:
+            await interaction.response.send_message(
+                "❌ Kamu harus berada di voice channel.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.defer()
+
+        voice = interaction.guild.voice_client
+
+        if voice is None:
+            channel = interaction.user.voice.channel
+            voice = await channel.connect()
+
+        player = get_player(
+            interaction.guild.id
+        )
+
+        song = await get_song_info(lagu)
+
+        player["queue"].append(song)
+
+        await interaction.followup.send(
+            f"🎵 **{song['title']}** ditambahkan ke queue!"
         )
 
     print("Music scheduler loaded")

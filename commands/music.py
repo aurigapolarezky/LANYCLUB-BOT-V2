@@ -176,13 +176,11 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
         interaction: discord.Interaction,
         query: str
     ):
-
         await interaction.response.defer()
 
         if not interaction.user.voice:
-            await interaction.response.send_message(
-                "❌ Kamu harus masuk voice channel dulu.",
-                ephemeral=True
+            await interaction.followup.send(
+                "❌ Kamu harus masuk voice channel dulu."
             )
             return
 
@@ -192,9 +190,8 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
             player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
             )
-        
-        try:
 
+        try:
             tracks = await wavelink.Playable.search(
                 query,
                 source="ytmsearch"
@@ -203,13 +200,13 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
         except Exception as e:
             print("SEARCH ERROR:", e)
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"❌ Error saat mencari lagu:\n{e}"
             )
             return
 
         if not tracks:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "❌ Lagu tidak ditemukan."
             )
             return
@@ -218,17 +215,12 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
 
         if player.playing:
             await player.queue.put_wait(track)
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"➕ Ditambahkan ke queue:\n**{track.title}**"
             )
         else:
-            print("Track dipilih:", track.title)
-            print("Player:", player)
-            print("Voice Connected:", player.connected)
-
             await player.play(track)
-            print("Perintah play berhasil dikirim ke Lavalink")
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 f"▶️ Sekarang memutar:\n**{track.title}**"
             )
     

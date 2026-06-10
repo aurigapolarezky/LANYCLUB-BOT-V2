@@ -190,8 +190,21 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
             player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
             )
+        
+        try:
 
-        tracks = await wavelink.Playable.search(query)
+            tracks = await wavelink.Playable.search(
+                query,
+                source="ytmsearch"
+            )
+            print("HASIL SEARCH:", tracks)
+
+        except Exception as e:
+            print("SEARCH ERROR:", e)
+            await interaction.response.send_message(
+                f"❌ Error saat mencari lagu:\n{e}"
+            )
+        return
 
         if not tracks:
             await interaction.response.send_message(

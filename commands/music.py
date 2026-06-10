@@ -177,6 +177,8 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
         query: str
     ):
 
+        await interaction.response.defer()
+
         if not interaction.user.voice:
             await interaction.response.send_message(
                 "❌ Kamu harus masuk voice channel dulu.",
@@ -204,7 +206,7 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
             await interaction.response.send_message(
                 f"❌ Error saat mencari lagu:\n{e}"
             )
-        return
+            return
 
         if not tracks:
             await interaction.response.send_message(
@@ -220,7 +222,12 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
                 f"➕ Ditambahkan ke queue:\n**{track.title}**"
             )
         else:
+            print("Track dipilih:", track.title)
+            print("Player:", player)
+            print("Voice Connected:", player.connected)
+
             await player.play(track)
+            print("Perintah play berhasil dikirim ke Lavalink")
             await interaction.response.send_message(
                 f"▶️ Sekarang memutar:\n**{track.title}**"
             )
@@ -228,6 +235,8 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
     @bot.event
     async def on_wavelink_track_end(payload):
 
+        await interaction.followup.send
+        
         player: wavelink.Player = payload.player
 
         if player.queue.is_empty:

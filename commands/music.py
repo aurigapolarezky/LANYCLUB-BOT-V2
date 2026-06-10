@@ -10,6 +10,7 @@ from music.ytdl import (
     FFMPEG_OPTIONS
 )
 from music.state import get_player
+from music.player import play_next
 
 last_poll_message_id = None
 
@@ -202,6 +203,16 @@ def setup_music(bot, scheduler, GENERAL_CHANNEL_ID):
         await interaction.followup.send(
             f"🎵 **{song['title']}** ditambahkan ke queue!"
         )
+
+# Jika belum ada lagu yang sedang diputar
+        if (
+            voice.is_playing() is False and
+            player["current"] is None
+        ):
+            await play_next(
+                bot,
+                interaction.guild
+            )
 
     print("Music scheduler loaded")
     print(scheduler.get_jobs())
